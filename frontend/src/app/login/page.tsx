@@ -1,36 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Palette, ArrowLeft, Mail, Lock, User } from "lucide-react"
-import Link from "next/link"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Palette, ArrowLeft, Mail, Lock, User } from "lucide-react";
+import Link from "next/link";
 
 export default function LoginPage() {
-  const [isSignUp, setIsSignUp] = useState(false)
+  const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-  })
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // ここで実際の認証処理を行う
-    console.log("Form submitted:", formData)
-  }
+    console.log("Form submitted:", formData);
+  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -49,7 +55,9 @@ export default function LoginPage() {
 
         <Card className="shadow-lg">
           <CardHeader className="text-center space-y-1">
-            <CardTitle className="text-2xl font-bold">{isSignUp ? "新規登録" : "ログイン"}</CardTitle>
+            <CardTitle className="text-2xl font-bold">
+              {isSignUp ? "新規登録" : "ログイン"}
+            </CardTitle>
             <CardDescription>
               {isSignUp
                 ? "アカウントを作成して、あなたの感情を世界と共有しましょう"
@@ -58,7 +66,11 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Googleログインボタン */}
-            <Button variant="outline" className="w-full bg-transparent hover:bg-muted/50" size="lg">
+            <Button
+              variant="outline"
+              className="w-full bg-transparent hover:bg-muted/50"
+              size="lg"
+            >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -85,7 +97,9 @@ export default function LoginPage() {
                 <Separator className="w-full" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">または</span>
+                <span className="bg-background px-2 text-muted-foreground">
+                  または
+                </span>
               </div>
             </div>
 
@@ -147,7 +161,28 @@ export default function LoginPage() {
                     className="pl-10"
                     required
                   />
-                </div>
+                     </div>
+                  {isSignUp && (
+                    <div className="space-y-2">
+                      <Label htmlFor="password" className="text-sm font-medium">
+                        確認パスワード
+                      </Label>
+                      <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                    </div>
+                  )}
+             
               </div>
 
               <Button type="submit" className="w-full" size="lg">
@@ -157,9 +192,15 @@ export default function LoginPage() {
 
             <div className="text-center text-sm">
               <span className="text-muted-foreground">
-                {isSignUp ? "すでにアカウントをお持ちですか？" : "アカウントをお持ちでない方は"}
+                {isSignUp
+                  ? "すでにアカウントをお持ちですか？"
+                  : "アカウントをお持ちでない方は"}
               </span>
-              <Button variant="link" className="p-0 ml-1 h-auto font-medium" onClick={() => setIsSignUp(!isSignUp)}>
+              <Button
+                variant="link"
+                className="p-0 ml-1 h-auto font-medium"
+                onClick={() => setIsSignUp(!isSignUp)}
+              >
                 {isSignUp ? "ログイン" : "新規登録"}
               </Button>
             </div>
@@ -167,5 +208,5 @@ export default function LoginPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
