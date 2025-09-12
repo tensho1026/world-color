@@ -11,8 +11,8 @@ export const registerSchema = z
   })
   .refine((data) => data.password === data.passwordconfirm, {
     message: "パスワードが一致しません",
-    path: ["passwordConfirm"],
-  });
+    path: ["passwordconfirm"],
+  }).transform((passwordconfirm,...rest) => rest)
 
 export const loginSchema = z.object({
   email: z
