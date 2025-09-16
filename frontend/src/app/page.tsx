@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -36,11 +36,34 @@ const emotions = [
 ];
 
 export default function EmotionColorApp() {
-  const [currentEmotion, setCurrentEmotion] = useState(emotions[1]); // デフォルトは「幸せ」
+  const [currentEmotion, setCurrentEmotion] = useState(emotions[1]);
   const [selectedEmotion, setSelectedEmotion] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+      if (token) {
+        const res = await fetch("http://localhost:8000/api/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
 
+  useEffect(() => {
+    console.log(user, "user情報");
+  }, [user]);
   const handleEmotionSelect = (emotion: (typeof emotions)[0]) => {
     setSelectedEmotion(emotion.name);
     setCurrentEmotion(emotion);
@@ -60,10 +83,10 @@ export default function EmotionColorApp() {
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 bg-transparent"
-            >
+              className="gap-2 bg-transparent">
               <LogIn className="h-4 w-4" />
-              ログイン
+              {user ? "ログアウト" : "ログイン"}
+        
             </Button>
           </Link>
         </div>
@@ -85,8 +108,7 @@ export default function EmotionColorApp() {
             <CardContent className="pb-8">
               <div
                 className="w-48 h-48 mx-auto rounded-full shadow-2xl transition-all duration-1000 ease-in-out flex items-center justify-center"
-                style={{ backgroundColor: currentEmotion.color }}
-              >
+                style={{ backgroundColor: currentEmotion.color }}>
                 <div className="text-white text-3xl font-bold drop-shadow-lg">
                   {currentEmotion.name}
                 </div>
@@ -110,8 +132,7 @@ export default function EmotionColorApp() {
               <DialogTrigger asChild>
                 <Button
                   size="lg"
-                  className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                >
+                  className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
                   今の気分は？
                 </Button>
               </DialogTrigger>
@@ -129,8 +150,7 @@ export default function EmotionColorApp() {
                     <Card
                       key={emotion.name}
                       className="cursor-pointer hover:scale-105 transition-all duration-200 hover:shadow-lg border-2 hover:border-primary/50"
-                      onClick={() => handleEmotionSelect(emotion)}
-                    >
+                      onClick={() => handleEmotionSelect(emotion)}>
                       <CardContent className="p-4 text-center">
                         <div
                           className="w-16 h-16 mx-auto rounded-full mb-3 shadow-md"
