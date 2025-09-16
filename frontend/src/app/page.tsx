@@ -1,9 +1,14 @@
+"use client";
 
-"use client"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -11,9 +16,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Heart, Users, Palette, LogIn } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Heart, Users, Palette, LogIn } from "lucide-react";
+import Link from "next/link";
 
 // 感情の選択肢とそれに対応する色
 const emotions = [
@@ -27,19 +33,42 @@ const emotions = [
   { name: "退屈", color: "#6b7280", bgColor: "bg-gray-500" },
   { name: "希望", color: "#06b6d4", bgColor: "bg-cyan-500" },
   { name: "愛", color: "#ec4899", bgColor: "bg-pink-500" },
-]
+];
 
 export default function EmotionColorApp() {
-  const [currentEmotion, setCurrentEmotion] = useState(emotions[1]) // デフォルトは「幸せ」
-  const [selectedEmotion, setSelectedEmotion] = useState<string>("")
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isLoginOpen, setIsLoginOpen] = useState(false)
+  const [currentEmotion, setCurrentEmotion] = useState(emotions[1]);
+  const [selectedEmotion, setSelectedEmotion] = useState<string>("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+      if (token) {
+        const res = await fetch("http://localhost:8000/api/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
 
+  useEffect(() => {
+    console.log(user, "user情報");
+  }, [user]);
   const handleEmotionSelect = (emotion: (typeof emotions)[0]) => {
-    setSelectedEmotion(emotion.name)
-    setCurrentEmotion(emotion)
-    setIsDialogOpen(false)
-  }
+    setSelectedEmotion(emotion.name);
+    setCurrentEmotion(emotion);
+    setIsDialogOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -50,28 +79,16 @@ export default function EmotionColorApp() {
             <Palette className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-bold text-foreground">世界の感情色</h1>
           </div>
-          <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                <LogIn className="h-4 w-4" />
-                ログイン
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>ログイン</DialogTitle>
-                <DialogDescription>アカウントにログインして、あなたの感情を世界と共有しましょう。</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <Button className="w-full" size="lg">
-                  Googleでログイン
-                </Button>
-                <Button variant="outline" className="w-full bg-transparent" size="lg">
-                  メールでログイン
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Link href="/login">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 bg-transparent">
+              <LogIn className="h-4 w-4" />
+              {user ? "ログアウト" : "ログイン"}
+        
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -81,15 +98,20 @@ export default function EmotionColorApp() {
           {/* 現在の世界の感情色表示 */}
           <Card className="text-center overflow-hidden">
             <CardHeader className="pb-4">
-              <CardTitle className="text-2xl font-bold text-balance">今、世界はこんな気持ち</CardTitle>
-              <CardDescription className="text-lg">世界中の人々が感じている感情の色</CardDescription>
+              <CardTitle className="text-2xl font-bold text-balance">
+                今、世界はこんな気持ち
+              </CardTitle>
+              <CardDescription className="text-lg">
+                世界中の人々が感じている感情の色
+              </CardDescription>
             </CardHeader>
             <CardContent className="pb-8">
               <div
                 className="w-48 h-48 mx-auto rounded-full shadow-2xl transition-all duration-1000 ease-in-out flex items-center justify-center"
-                style={{ backgroundColor: currentEmotion.color }}
-              >
-                <div className="text-white text-3xl font-bold drop-shadow-lg">{currentEmotion.name}</div>
+                style={{ backgroundColor: currentEmotion.color }}>
+                <div className="text-white text-3xl font-bold drop-shadow-lg">
+                  {currentEmotion.name}
+                </div>
               </div>
               <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground">
                 <div className="flex items-center gap-1">
@@ -110,14 +132,15 @@ export default function EmotionColorApp() {
               <DialogTrigger asChild>
                 <Button
                   size="lg"
-                  className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                >
+                  className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
                   今の気分は？
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle className="text-2xl text-center">今日の気分は？</DialogTitle>
+                  <DialogTitle className="text-2xl text-center">
+                    今日の気分は？
+                  </DialogTitle>
                   <DialogDescription className="text-center text-lg">
                     あなたの今の気持ちを選んでください
                   </DialogDescription>
@@ -127,8 +150,7 @@ export default function EmotionColorApp() {
                     <Card
                       key={emotion.name}
                       className="cursor-pointer hover:scale-105 transition-all duration-200 hover:shadow-lg border-2 hover:border-primary/50"
-                      onClick={() => handleEmotionSelect(emotion)}
-                    >
+                      onClick={() => handleEmotionSelect(emotion)}>
                       <CardContent className="p-4 text-center">
                         <div
                           className="w-16 h-16 mx-auto rounded-full mb-3 shadow-md"
@@ -148,7 +170,10 @@ export default function EmotionColorApp() {
             <Card className="bg-primary/5 border-primary/20">
               <CardContent className="p-6 text-center">
                 <p className="text-lg">
-                  あなたの気持ち「<span className="font-bold text-primary">{selectedEmotion}</span>
+                  あなたの気持ち「
+                  <span className="font-bold text-primary">
+                    {selectedEmotion}
+                  </span>
                   」を世界の感情色に反映しました！
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
@@ -160,5 +185,5 @@ export default function EmotionColorApp() {
         </div>
       </main>
     </div>
-  )
+  );
 }
