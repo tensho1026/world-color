@@ -23,7 +23,7 @@ import {
 } from "@/schema/auth/auth-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
 
   const {
@@ -31,7 +31,7 @@ export default function RegisterPage() {
     formState: { errors },
     handleSubmit,
   } = useForm({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(loginSchema),
   });
 
   // const handleSubmit = (e: React.FormEvent) => {
@@ -90,7 +90,7 @@ export default function RegisterPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Googleで{isSignUp ? "登録" : "ログイン"}
+              Googleでログイン
             </Button>
 
             <div className="relative">
@@ -109,31 +109,6 @@ export default function RegisterPage() {
               onSubmit={handleSubmit((data) => console.log(data))}
               className="space-y-4"
             >
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium">
-                  名前
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    {...register("name")}
-                    id="name"
-                    type="text"
-                    placeholder="山田太郎"
-                    className={
-                      errors.name
-                        ? "border-red-500 focus-visible:ring-red-500 pl-10"
-                        : "pl-10"
-                    }
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-red-500">
-                      {errors.name.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
                   メールアドレス
@@ -181,48 +156,26 @@ export default function RegisterPage() {
                     </p>
                   )}
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium">
-                    確認パスワード
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      {...register("passwordconfirm")}
-                      type="password"
-                      placeholder="確認パスワード"
-                      className={
-                        errors.passwordconfirm
-                          ? "border-red-500 focus-visible:ring-red-500 pl-10"
-                          : "pl-10"
-                      }
-                    />
-                    {errors.passwordconfirm && (
-                      <p className="text-sm text-red-500">
-                        {errors.passwordconfirm?.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
               </div>
 
               <Button type="submit" className="w-full" size="lg">
-                アカウントを作成
+                ログイン
               </Button>
             </form>
 
             <div className="text-center text-sm">
               <span className="text-muted-foreground">
-                アカウントお持ちの方は
+                {isSignUp
+                  ? "すでにアカウントをお持ちですか？"
+                  : "アカウントをお持ちでない方は"}
               </span>
-              <Link href="/login">
+              <Link href="/register">
                 <Button
                   variant="link"
                   className="p-0 ml-1 h-auto font-medium"
                   onClick={() => setIsSignUp(!isSignUp)}
                 >
-                  ログイン
+                  新規登録
                 </Button>
               </Link>
             </div>
