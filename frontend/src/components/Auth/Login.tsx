@@ -12,19 +12,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Palette, ArrowLeft, Mail, Lock, User } from "lucide-react";
+import { Palette, ArrowLeft, Mail, Lock } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import {
-  loginForm,
-  loginSchema,
-  registerForm,
-  registerSchema,
-} from "@/schema/auth/auth-form";
+import { loginForm, loginSchema } from "@/schema/auth/auth-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -34,11 +31,22 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   // ここで実際の認証処理を行う
-  //   console.log("Form submitted:", formData);
-  // };
+  const onSubmit = async (data: loginForm) => {
+    const res = await fetch("http://localhost:8000/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...data,
+      }),
+    });
+    if (res) {
+      const data = await res.json();
+      console.log(data);
+      localStorage.setItem("token", data.access_token);
+      router.push("/");
+    }
+    console.log(data);
+  };
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
@@ -46,8 +54,7 @@ export default function LoginPage() {
         <div className="text-center space-y-2">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-4 w-4" />
             <Palette className="h-5 w-5" />
             <span className="text-sm">世界の感情色に戻る</span>
@@ -70,8 +77,7 @@ export default function LoginPage() {
             <Button
               variant="outline"
               className="w-full bg-transparent hover:bg-muted/50"
-              size="lg"
-            >
+              size="lg">
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -106,9 +112,8 @@ export default function LoginPage() {
 
             {/* メールログインフォーム */}
             <form
-              onSubmit={handleSubmit((data) => console.log(data))}
-              className="space-y-4"
-            >
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
                   メールアドレス
@@ -173,8 +178,7 @@ export default function LoginPage() {
                 <Button
                   variant="link"
                   className="p-0 ml-1 h-auto font-medium"
-                  onClick={() => setIsSignUp(!isSignUp)}
-                >
+                  onClick={() => setIsSignUp(!isSignUp)}>
                   新規登録
                 </Button>
               </Link>
