@@ -15,30 +15,39 @@ import { Separator } from "@/components/ui/separator";
 import { Palette, ArrowLeft, Mail, Lock, User } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import {
-  loginForm,
-  loginSchema,
-  registerForm,
-  registerSchema,
-} from "@/schema/auth/auth-form";
+import { RegisterPayload, registerSchemaRaw } from "@/schema/auth/auth-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+
+  const router = useRouter();
 
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(registerSchemaRaw),
   });
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   // ここで実際の認証処理を行う
-  //   console.log("Form submitted:", formData);
-  // };
+  const onSubmit = async (data: RegisterPayload) => {
+    const res = await fetch("http://localhost:8000/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...data,
+      }),
+    });
+    if (res) {
+      const data = await res.json();
+      console.log(data);
+      localStorage.setItem("token", data.access_token);
+      router.push("/");
+    }
+    console.log(data);
+  };
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
@@ -46,8 +55,7 @@ export default function RegisterPage() {
         <div className="text-center space-y-2">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-4 w-4" />
             <Palette className="h-5 w-5" />
             <span className="text-sm">世界の感情色に戻る</span>
@@ -70,8 +78,7 @@ export default function RegisterPage() {
             <Button
               variant="outline"
               className="w-full bg-transparent hover:bg-muted/50"
-              size="lg"
-            >
+              size="lg">
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -105,10 +112,7 @@ export default function RegisterPage() {
             </div>
 
             {/* メールログインフォーム */}
-            <form
-              onSubmit={handleSubmit((data) => console.log(data))}
-              className="space-y-4"
-            >
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">
                   名前
@@ -220,8 +224,7 @@ export default function RegisterPage() {
                 <Button
                   variant="link"
                   className="p-0 ml-1 h-auto font-medium"
-                  onClick={() => setIsSignUp(!isSignUp)}
-                >
+                  onClick={() => setIsSignUp(!isSignUp)}>
                   ログイン
                 </Button>
               </Link>
