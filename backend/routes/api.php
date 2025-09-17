@@ -61,8 +61,13 @@ Route::post('/login', function (Request $request) {
     ]);
 });
 
-// ログイン済みユーザー情報
+
 Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
     return $request->user();
+});
+
+Route::middleware('auth:sanctum')->post('/logout',function(Request $request) {
+    $request->user()->currentAccessToken()->delete();
+    return response()->json(['message' => 'Logged out']);
 });
 

@@ -18,8 +18,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Users, Palette, LogIn } from "lucide-react";
+import { Heart, Users, Palette, LogIn, } from "lucide-react";
 import Link from "next/link";
+import { LogoutButton } from "@/components/Auth/Logout";
 
 // 感情の選択肢とそれに対応する色
 const emotions = [
@@ -79,16 +80,19 @@ export default function EmotionColorApp() {
             <Palette className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-bold text-foreground">世界の感情色</h1>
           </div>
-          <Link href="/login">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2 bg-transparent">
-              <LogIn className="h-4 w-4" />
-              {user ? "ログアウト" : "ログイン"}
-        
-            </Button>
-          </Link>
+          {!user ? (
+            <Link href="/login">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 bg-transparent">
+                <LogIn className="h-4 w-4" />
+                ログイン
+              </Button>
+            </Link>
+          ) : (
+            <LogoutButton/>
+          )}
         </div>
       </header>
 
