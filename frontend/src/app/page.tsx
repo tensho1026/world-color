@@ -16,9 +16,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Users, Palette, LogIn, } from "lucide-react";
+import { Heart, Users, Palette, LogIn } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/Auth/Logout";
 
@@ -91,7 +92,7 @@ export default function EmotionColorApp() {
               </Button>
             </Link>
           ) : (
-            <LogoutButton/>
+            <LogoutButton />
           )}
         </div>
       </header>
@@ -124,7 +125,7 @@ export default function EmotionColorApp() {
                 </div>
                 <Badge variant="secondary" className="gap-1">
                   <Heart className="h-3 w-3" />
-                  リアルタイム更新
+                  {currentEmotion.color}
                 </Badge>
               </div>
             </CardContent>
@@ -140,8 +141,15 @@ export default function EmotionColorApp() {
                   今の気分は？
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
+              <DialogContent
+                showCloseButton={false}
+                className="sm:max-w-2xl max-h-[85vh] overflow-y-auto p-4">
+                <DialogHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-3 relative">
+                  <DialogClose
+                    aria-label="閉じる"
+                    className="absolute right-0 top-0 mr-1 mt-1 rounded-md w-10 h-10 flex items-center justify-center text-2xl text-muted-foreground hover:text-foreground focus:outline-none">
+                    ×
+                  </DialogClose>
                   <DialogTitle className="text-2xl text-center">
                     今日の気分は？
                   </DialogTitle>
@@ -149,7 +157,7 @@ export default function EmotionColorApp() {
                     あなたの今の気持ちを選んでください
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 py-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 py-6 pb-2">
                   {emotions.map((emotion) => (
                     <Card
                       key={emotion.name}
@@ -175,7 +183,9 @@ export default function EmotionColorApp() {
               <CardContent className="p-6 text-center">
                 <p className="text-lg">
                   あなたの気持ち「
-                  <span className="font-bold text-primary">
+                  <span
+                    className={`font-bold`}
+                    style={{ color: currentEmotion.color }}>
                     {selectedEmotion}
                   </span>
                   」を世界の感情色に反映しました！
