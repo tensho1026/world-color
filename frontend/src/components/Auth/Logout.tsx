@@ -12,11 +12,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useRouter } from "next/navigation";
 
 export function LogoutButton() {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
