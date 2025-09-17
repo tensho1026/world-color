@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState<string>();
   const router = useRouter();
 
   const {
@@ -39,9 +40,15 @@ export default function LoginPage() {
         ...data,
       }),
     });
+    if (res.status === 401) {
+      setError("メールアドレスまたはパスワードが間違っています");
+      return;
+    }
+
     if (res) {
       const data = await res.json();
-      console.log(data);
+
+      console.log(data, "これはデータです");
       localStorage.setItem("token", data.access_token);
       router.push("/");
     }
@@ -54,7 +61,8 @@ export default function LoginPage() {
         <div className="text-center space-y-2">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ArrowLeft className="h-4 w-4" />
             <Palette className="h-5 w-5" />
             <span className="text-sm">世界の感情色に戻る</span>
@@ -77,7 +85,8 @@ export default function LoginPage() {
             <Button
               variant="outline"
               className="w-full bg-transparent hover:bg-muted/50"
-              size="lg">
+              size="lg"
+            >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -111,9 +120,7 @@ export default function LoginPage() {
             </div>
 
             {/* メールログインフォーム */}
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
                   メールアドレス
@@ -166,6 +173,7 @@ export default function LoginPage() {
               <Button type="submit" className="w-full" size="lg">
                 ログイン
               </Button>
+              {error ? <p className="text-sm text-red-500 whitespace-nowrap">{error}</p> : null}
             </form>
 
             <div className="text-center text-sm">
@@ -178,7 +186,8 @@ export default function LoginPage() {
                 <Button
                   variant="link"
                   className="p-0 ml-1 h-auto font-medium"
-                  onClick={() => setIsSignUp(!isSignUp)}>
+                  onClick={() => setIsSignUp(!isSignUp)}
+                >
                   新規登録
                 </Button>
               </Link>
