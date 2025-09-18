@@ -78,11 +78,15 @@ Route::get('get-moods',function(){
     return response()->json($moods);
 });
 
-Route::post('/vote',function(Request $request) {
-    $vote = Vote::updateOrCreate([
-        'user_id' => $request->user_id,
-    ],[
-        'mood_id' => $request->mood_id,
+Route::middleware('auth:sanctum')->post('/vote',function(Request $request) {
+    $request->validate([
+        'mood_id' => 'required|exists:moods,id',
     ]);
+
+    $vote = Vote::updateOrCreate(
+        [ 'user_id' => $request->user()->id ],
+        [ 'mood_id' => $request->mood_id ]
+    );
+
     return response()->json($vote);
 });
