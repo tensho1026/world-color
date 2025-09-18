@@ -81,21 +81,21 @@ export default function EmotionColorApp() {
     setIsDialogOpen(false);
   };
 
-  const handleVote = async () => {
-    if (selectedEmotion) {
-      const res = await fetch("http://localhost:8000/api/vote", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: user?.id,
-          mood_id: selectedEmotion.id,
-        }),
-      });
-      if (res.ok) {
-        console.log("投票しました");
-      }
+  const handleVote = async (emotion: Emotion) => {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const res = await fetch("http://localhost:8000/api/vote", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        mood_id: emotion.id,
+      }),
+    });
+    if (res.ok) {
+      console.log("投票しました");
     }
   };
 
@@ -195,7 +195,7 @@ export default function EmotionColorApp() {
                       className="cursor-pointer hover:scale-105 transition-all duration-200 hover:shadow-lg border-2 hover:border-primary/50"
                       onClick={() => {
                         handleEmotionSelect(emotion);
-                        handleVote();
+                        handleVote(emotion);
                       }}>
                       <CardContent className="p-4 text-center">
                         <div
