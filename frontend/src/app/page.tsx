@@ -33,9 +33,9 @@ export default function EmotionColorApp() {
   const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [currentEmotion, setCurrentEmotion] = useState<null | Emotion>(null);
 
-  const [selectedEmotion, setSelectedEmotion] = useState<string>("");
+  const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const fetchMoods = async () => {
@@ -76,9 +76,27 @@ export default function EmotionColorApp() {
     console.log(user, "user情報");
   }, [user]);
   const handleEmotionSelect = (emotion: (typeof emotions)[0]) => {
-    setSelectedEmotion(emotion.name);
+    setSelectedEmotion(emotion);
     setCurrentEmotion(emotion);
     setIsDialogOpen(false);
+  };
+
+  const handleVote = async () => {
+    if (selectedEmotion) {
+      const res = await fetch("http://localhost:8000/api/vote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: user?.id,
+          mood_id: selectedEmotion.id,
+        }),
+      });
+      if (res.ok) {
+        console.log("投票しました");
+      }
+    }
   };
 
   return (
@@ -175,7 +193,10 @@ export default function EmotionColorApp() {
                     <Card
                       key={emotion.name}
                       className="cursor-pointer hover:scale-105 transition-all duration-200 hover:shadow-lg border-2 hover:border-primary/50"
-                      onClick={() => handleEmotionSelect(emotion)}>
+                      onClick={() => {
+                        handleEmotionSelect(emotion);
+                        handleVote();
+                      }}>
                       <CardContent className="p-4 text-center">
                         <div
                           className="w-16 h-16 mx-auto rounded-full mb-3 shadow-md"
@@ -199,7 +220,7 @@ export default function EmotionColorApp() {
                   <span
                     className={`font-bold`}
                     style={{ color: currentEmotion?.color_code }}>
-                    {selectedEmotion}
+                    {selectedEmotion.name}
                   </span>
                   」を世界の感情色に反映しました！
                 </p>

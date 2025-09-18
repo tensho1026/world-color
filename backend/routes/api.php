@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Support\Facades\Log;
 use App\Models\Mood;
+use App\Models\Vote;
 
 
 Log::info('api.php is loaded!');
@@ -75,4 +76,13 @@ Route::middleware('auth:sanctum')->post('/logout',function(Request $request) {
 Route::get('get-moods',function(){
     $moods = Mood::all();
     return response()->json($moods);
+});
+
+Route::post('/vote',function(Request $request) {
+    $vote = Vote::updateOrCreate([
+        'user_id' => $request->user_id,
+    ],[
+        'mood_id' => $request->mood_id,
+    ]);
+    return response()->json($vote);
 });
