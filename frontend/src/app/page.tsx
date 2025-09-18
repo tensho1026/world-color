@@ -23,25 +23,34 @@ import { Heart, Users, Palette, LogIn } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/Auth/Logout";
 
-// 感情の選択肢とそれに対応する色
-const emotions = [
-  { name: "楽しい", color: "#fbbf24", bgColor: "bg-yellow-400" },
-  { name: "幸せ", color: "#f472b6", bgColor: "bg-pink-400" },
-  { name: "穏やか", color: "#4ade80", bgColor: "bg-green-400" },
-  { name: "興奮", color: "#f97316", bgColor: "bg-orange-500" },
-  { name: "悲しい", color: "#3b82f6", bgColor: "bg-blue-500" },
-  { name: "不安", color: "#8b5cf6", bgColor: "bg-purple-500" },
-  { name: "怒り", color: "#ef4444", bgColor: "bg-red-500" },
-  { name: "退屈", color: "#6b7280", bgColor: "bg-gray-500" },
-  { name: "希望", color: "#06b6d4", bgColor: "bg-cyan-500" },
-  { name: "愛", color: "#ec4899", bgColor: "bg-pink-500" },
-];
+type Emotion = {
+  id: string;
+  name: string;
+  color_code: string;
+};
 
 export default function EmotionColorApp() {
-  const [currentEmotion, setCurrentEmotion] = useState(emotions[1]);
+  const [emotions, setEmotions] = useState<Emotion[]>([]);
+  const [currentEmotion, setCurrentEmotion] = useState<null | Emotion>(null);
+
   const [selectedEmotion, setSelectedEmotion] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchMoods = async () => {
+      const res = await fetch("http://localhost:8000/api/get-moods");
+      if (res.ok) {
+        const data = await res.json();
+        setEmotions(data);
+      }
+    };
+    fetchMoods();
+  }, []);
+  useEffect(() => {
+    console.log(emotions, "emotions情報");
+  }, [emotions]);
+
   useEffect(() => {
     const fetchUser = async () => {
       const token = localStorage.getItem("token");
@@ -110,25 +119,29 @@ export default function EmotionColorApp() {
                 世界中の人々が感じている感情の色
               </CardDescription>
             </CardHeader>
-            <CardContent className="pb-8">
-              <div
-                className="w-48 h-48 mx-auto rounded-full shadow-2xl transition-all duration-1000 ease-in-out flex items-center justify-center"
-                style={{ backgroundColor: currentEmotion.color }}>
-                <div className="text-white text-3xl font-bold drop-shadow-lg">
-                  {currentEmotion.name}
-                </div>
-              </div>
-              <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  <span className="text-sm">12,847人が参加中</span>
-                </div>
-                <Badge variant="secondary" className="gap-1">
-                  <Heart className="h-3 w-3" />
-                  {currentEmotion.color}
-                </Badge>
-              </div>
-            </CardContent>
+            {currentEmotion ? (
+              <>
+                <CardContent className="pb-8">
+                  <div
+                    className="w-48 h-48 mx-auto rounded-full shadow-2xl transition-all duration-1000 ease-in-out flex items-center justify-center"
+                    style={{ backgroundColor: currentEmotion.color_code }}>
+                    <div className="text-white text-3xl font-bold drop-shadow-lg">
+                      {currentEmotion.name}
+                    </div>
+                  </div>
+                  <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Users className="h-4 w-4" />
+                      <span className="text-sm">12,847人が参加中</span>
+                    </div>
+                    <Badge variant="secondary" className="gap-1">
+                      <Heart className="h-3 w-3" />
+                      {currentEmotion.color_code}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </>
+            ) : null}
           </Card>
 
           {/* 気分選択ボタン */}
@@ -166,7 +179,7 @@ export default function EmotionColorApp() {
                       <CardContent className="p-4 text-center">
                         <div
                           className="w-16 h-16 mx-auto rounded-full mb-3 shadow-md"
-                          style={{ backgroundColor: emotion.color }}
+                          style={{ backgroundColor: emotion.color_code }}
                         />
                         <p className="font-medium text-sm">{emotion.name}</p>
                       </CardContent>
@@ -185,7 +198,7 @@ export default function EmotionColorApp() {
                   あなたの気持ち「
                   <span
                     className={`font-bold`}
-                    style={{ color: currentEmotion.color }}>
+                    style={{ color: currentEmotion?.color_code }}>
                     {selectedEmotion}
                   </span>
                   」を世界の感情色に反映しました！
