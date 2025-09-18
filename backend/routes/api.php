@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Support\Facades\Log;
+use App\Models\Mood;
 
 
 Log::info('api.php is loaded!');
@@ -71,3 +72,7 @@ Route::middleware('auth:sanctum')->post('/logout',function(Request $request) {
     return response()->json(['message' => 'Logged out']);
 });
 
+Route::get('get-moods',function(){
+    $moods = Mood::all();
+    return response()->json($moods);
+});
