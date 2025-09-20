@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Models\Mood;
 use App\Models\Vote;
+use Carbon\Carbon;
 
 
 Log::info('api.php is loaded!');
@@ -89,4 +90,40 @@ Route::middleware('auth:sanctum')->post('/vote',function(Request $request) {
     );
 
     return response()->json($vote);
+});
+
+Route::get('get-world-color',function() {
+$recentVotes = Vote::where('updated_at','>=',Carbon::now()->subHours())->get();
+
+if ($recentVotes->isEmpty()) {
+    return response()->json(['world_color' => '#FFFFFF']); 
+}
+
+    $moodIds = $recentVotes->pluck('mood_id');
+
+    $totalColors = Mood::whereIn('id', $moodIds)->get();
+
+
+    $colors = $totalColors->map(function ($vote) {
+        $hex = ltrim($vote->color_code, '#');
+        return [
+            'r' => hexdec(substr($hex, 0, 2)),
+            'g' => hexdec(substr($hex, 2, 2)),
+            'b' => hexdec(substr($hex, 4, 2)),
+        ];
+    });
+    $avg = [
+        'r' => intval($colors->avg('r')),
+        'g' => intval($colors->avg('g')),
+        'b' => intval($colors->avg('b')),
+    ];
+
+    $worldColor = sprintf("#%02x%02x%02x", $avg['r'], $avg['g'], $avg['b']);
+
+    return response()->json([
+        'world_color' => $worldColor,
+    ]);
+
+
+
 });

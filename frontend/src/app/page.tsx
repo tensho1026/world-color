@@ -29,6 +29,10 @@ type Emotion = {
   color_code: string;
 };
 
+type WorldColor = {
+  world_color: string;
+};
+
 export default function EmotionColorApp() {
   const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [currentEmotion, setCurrentEmotion] = useState<null | Emotion>(null);
@@ -36,6 +40,22 @@ export default function EmotionColorApp() {
   const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [worldColor, setWorldColor] = useState<WorldColor | null>(null);
+
+  useEffect(() => {
+    const fetchWorldColor = async () => {
+      const res = await fetch("http://localhost:8000/api/get-world-color");
+      if (res.ok) {
+        const data = await res.json();
+        console.log(data, "worldcolor情報");
+        setWorldColor(data);
+      }
+    };
+    fetchWorldColor();
+  }, []);
+  useEffect(() => {
+    console.log(worldColor, "worldColor情報");
+  }, [worldColor]);
 
   useEffect(() => {
     const fetchMoods = async () => {
@@ -96,6 +116,7 @@ export default function EmotionColorApp() {
     });
     if (res.ok) {
       console.log("投票しました");
+      window.location.reload();
     }
   };
 
@@ -137,14 +158,16 @@ export default function EmotionColorApp() {
                 世界中の人々が感じている感情の色
               </CardDescription>
             </CardHeader>
-            {currentEmotion ? (
+            {worldColor?.world_color ? (
               <>
                 <CardContent className="pb-8">
                   <div
                     className="w-48 h-48 mx-auto rounded-full shadow-2xl transition-all duration-1000 ease-in-out flex items-center justify-center"
-                    style={{ backgroundColor: currentEmotion.color_code }}>
+                    style={{
+                      backgroundColor: worldColor?.world_color ?? "#FFFFFF",
+                    }}>
                     <div className="text-white text-3xl font-bold drop-shadow-lg">
-                      {currentEmotion.name}
+                      {worldColor?.world_color}
                     </div>
                   </div>
                   <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground">
@@ -154,7 +177,7 @@ export default function EmotionColorApp() {
                     </div>
                     <Badge variant="secondary" className="gap-1">
                       <Heart className="h-3 w-3" />
-                      {currentEmotion.color_code}
+                      {worldColor?.world_color}
                     </Badge>
                   </div>
                 </CardContent>
