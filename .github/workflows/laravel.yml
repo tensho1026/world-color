@@ -25,7 +25,7 @@ jobs:
       # PHP 環境
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.2'
 
       - run: composer install --no-interaction --prefer-dist --working-dir=backend
       - run: php backend/artisan key:generate
