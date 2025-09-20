@@ -67,9 +67,7 @@ export default function EmotionColorApp() {
     };
     fetchMoods();
   }, []);
-  useEffect(() => {
-    console.log(emotions, "emotions情報");
-  }, [emotions]);
+
 
   useEffect(() => {
     const fetchUser = async () => {
