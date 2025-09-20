@@ -28,6 +28,11 @@ jobs:
           php-version: '8.2'
 
       - run: composer install --no-interaction --prefer-dist --working-dir=backend
+
+      # ここを追加
+      - name: Copy .env
+        run: php -r "file_exists('backend/.env') || copy('backend/.env.example', 'backend/.env');"
+
       - run: php backend/artisan key:generate
       - run: php backend/artisan migrate --force
         env:
