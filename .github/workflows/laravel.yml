@@ -29,19 +29,24 @@ jobs:
 
       - run: composer install --no-interaction --prefer-dist --working-dir=backend
 
-      # ここを追加
+      # .env ファイルコピー
       - name: Copy .env
         run: php -r "file_exists('backend/.env') || copy('backend/.env.example', 'backend/.env');"
 
-      - run: php backend/artisan key:generate
-      - run: php backend/artisan migrate --force
+      - run: php artisan key:generate
+        working-directory: backend
+
+      - run: php artisan migrate --force
+        working-directory: backend
         env:
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
           DB_DATABASE: laravel
           DB_USERNAME: laravel
           DB_PASSWORD: secret
-      - run: php backend/artisan test
+
+      - run: php artisan test
+        working-directory: backend
 
   frontend-tests:
     runs-on: ubuntu-latest
