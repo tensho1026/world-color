@@ -30,6 +30,7 @@ type Emotion = {
 };
 
 type WorldColor = {
+  colorsDescription: Emotion[];
   world_color: string;
 };
 
@@ -47,14 +48,15 @@ export default function EmotionColorApp() {
       const res = await fetch("http://localhost:8000/api/get-world-color");
       if (res.ok) {
         const data = await res.json();
-        console.log(data, "worldcolor情報");
+        // console.log(data, "worldcolor情報");
         setWorldColor(data);
       }
     };
     fetchWorldColor();
   }, []);
   useEffect(() => {
-    console.log(worldColor, "worldColor情報");
+    console.log(worldColor?.world_color, "今現在のworldColor情報");
+    console.log(worldColor?.colorsDescription, "グラフ表示用の内訳");
   }, [worldColor]);
 
   useEffect(() => {
@@ -67,7 +69,6 @@ export default function EmotionColorApp() {
     };
     fetchMoods();
   }, []);
-
 
   useEffect(() => {
     const fetchUser = async () => {

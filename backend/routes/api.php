@@ -121,6 +121,7 @@ if ($recentVotes->isEmpty()) {
     $worldColor = sprintf("#%02x%02x%02x", $avg['r'], $avg['g'], $avg['b']);
 
     return response()->json([
+        'colorsDescription' => $totalColors,
         'world_color' => $worldColor,
     ]);
 
