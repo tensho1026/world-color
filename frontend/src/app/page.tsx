@@ -90,9 +90,6 @@ export default function EmotionColorApp() {
     fetchUser();
   }, []);
 
-  useEffect(() => {
-    console.log(user, "user情報");
-  }, [user]);
   const handleEmotionSelect = (emotion: (typeof emotions)[0]) => {
     setSelectedEmotion(emotion);
     setCurrentEmotion(emotion);
