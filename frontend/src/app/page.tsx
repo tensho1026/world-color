@@ -110,7 +110,6 @@ export default function EmotionColorApp() {
       }),
     });
     if (res.ok) {
-      console.log("投票しました");
       window.location.reload();
     }
   };
