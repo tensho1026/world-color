@@ -23,8 +23,10 @@ import { Heart, Users, Palette, LogIn } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/Auth/Logout";
 import { useRouter } from "next/navigation";
+import Header from "@/components/home/Header";
+import Graqh from "@/components/home/Graqh";
 
-type Emotion = {
+export type Emotion = {
   id: string;
   name: string;
   color_code: string;
@@ -125,27 +127,7 @@ export default function EmotionColorApp() {
   return (
     <div className="min-h-screen bg-background">
       {/* ヘッダー */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Palette className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold text-foreground">世界の感情色</h1>
-          </div>
-          {!user ? (
-            <Link href="/login">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 bg-transparent">
-                <LogIn className="h-4 w-4" />
-                ログイン
-              </Button>
-            </Link>
-          ) : (
-            <LogoutButton />
-          )}
-        </div>
-      </header>
+      <Header user={user} />
 
       {/* メインコンテンツ */}
       <main className="container mx-auto px-4 py-8">
@@ -181,7 +163,7 @@ export default function EmotionColorApp() {
                   <CardContent className="pb-8">
                     {/* グラフ未実装: プレースホルダー */}
                     <div className="h-64 rounded-md border bg-muted/30 flex items-center justify-center text-muted-foreground">
-                      グラフ（準備中）
+                      <Graqh datas={worldColor?.colorsDescription} />
                     </div>
                     <div className="mt-4 text-sm text-muted-foreground">
                       参加者: {worldColor?.colorsDescription.length ?? 0} 件
