@@ -29,17 +29,18 @@ World Color は、**世界中の人の「今の感情」を集めて一色に混
 ## 📸 画面イメージ
 
 ### ホーム画面
-
+<img width="1467" height="842" alt="Image" src="https://github.com/user-attachments/assets/75e46138-623c-4315-86ed-cb95814110c9" />
 
 ---
 
 ### 感情入力画面
-（ここにスクリーンショットを挿入）
+<img width="657" height="713" alt="Image" src="https://github.com/user-attachments/assets/4476e322-cef3-4a95-b007-4d565c13e269" />
 
 ---
 
 ### グラフ表示画面
-（ここにスクリーンショットを挿入）
+<img width="1466" height="839" alt="Image" src="https://github.com/user-attachments/assets/6b4415e1-c258-4992-bd88-068c430bc3ba" />
+
 
 
 
