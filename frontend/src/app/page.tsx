@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Users, Palette, LogIn } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/Auth/Logout";
+import { useRouter } from "next/navigation";
 
 type Emotion = {
   id: string;
@@ -43,6 +44,8 @@ export default function EmotionColorApp() {
   const [user, setUser] = useState<any>(null);
   const [worldColor, setWorldColor] = useState<WorldColor | null>(null);
 
+  const router = useRouter();
+
   useEffect(() => {
     const fetchWorldColor = async () => {
       const res = await fetch("http://localhost:8000/api/get-world-color");
@@ -55,8 +58,11 @@ export default function EmotionColorApp() {
     fetchWorldColor();
   }, []);
   useEffect(() => {
+    console.log(user, "今現在のuser情報");
+  }, [user]);
+  useEffect(() => {
     console.log(worldColor?.world_color, "今現在のworldColor情報");
-    console.log(worldColor?.colorsDescription, "グラフ表示用の内訳");
+    console.log(worldColor?.colorsDescription.length, "グラフ表示用の内訳");
   }, [worldColor]);
 
   useEffect(() => {
@@ -168,7 +174,9 @@ export default function EmotionColorApp() {
                   <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Users className="h-4 w-4" />
-                      <span className="text-sm">12,847人が参加中</span>
+                      <span className="text-sm">
+                        {worldColor?.colorsDescription.length}人が参加中
+                      </span>
                     </div>
                     <Badge variant="secondary" className="gap-1">
                       <Heart className="h-3 w-3" />
@@ -186,7 +194,8 @@ export default function EmotionColorApp() {
               <DialogTrigger asChild>
                 <Button
                   size="lg"
-                  className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                  className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                  onClick={() => !user && router.push("/login")}>
                   今の気分は？
                 </Button>
               </DialogTrigger>
