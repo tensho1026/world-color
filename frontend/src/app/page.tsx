@@ -43,6 +43,7 @@ export default function EmotionColorApp() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [worldColor, setWorldColor] = useState<WorldColor | null>(null);
+  const [showGraph, setShowGraph] = useState(false);
 
   const router = useRouter();
 
@@ -62,7 +63,7 @@ export default function EmotionColorApp() {
   }, [user]);
   useEffect(() => {
     console.log(worldColor?.world_color, "今現在のworldColor情報");
-    console.log(worldColor?.colorsDescription.length, "グラフ表示用の内訳");
+    console.log(worldColor?.colorsDescription, "グラフ表示用の内訳");
   }, [worldColor]);
 
   useEffect(() => {
@@ -158,32 +159,59 @@ export default function EmotionColorApp() {
               <CardDescription className="text-lg">
                 世界中の人々が感じている感情の色
               </CardDescription>
+              {/* 表示切り替え */}
+              <div className="mt-3 flex justify-center gap-2">
+                <Button
+                  size="sm"
+                  variant={showGraph ? "outline" : "default"}
+                  onClick={() => setShowGraph(false)}>
+                  色表示
+                </Button>
+                <Button
+                  size="sm"
+                  variant={showGraph ? "default" : "outline"}
+                  onClick={() => setShowGraph(true)}>
+                  色内訳
+                </Button>
+              </div>
             </CardHeader>
             {worldColor?.world_color ? (
               <>
-                <CardContent className="pb-8">
-                  <div
-                    className="w-48 h-48 mx-auto rounded-full shadow-2xl transition-all duration-1000 ease-in-out flex items-center justify-center"
-                    style={{
-                      backgroundColor: worldColor?.world_color ?? "#FFFFFF",
-                    }}>
-                    <div className="text-white text-3xl font-bold drop-shadow-lg">
-                      {worldColor?.world_color}
+                {showGraph ? (
+                  <CardContent className="pb-8">
+                    {/* グラフ未実装: プレースホルダー */}
+                    <div className="h-64 rounded-md border bg-muted/30 flex items-center justify-center text-muted-foreground">
+                      グラフ（準備中）
                     </div>
-                  </div>
-                  <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      <span className="text-sm">
-                        {worldColor?.colorsDescription.length}人が参加中
-                      </span>
+                    <div className="mt-4 text-sm text-muted-foreground">
+                      参加者: {worldColor?.colorsDescription.length ?? 0} 件
                     </div>
-                    <Badge variant="secondary" className="gap-1">
-                      <Heart className="h-3 w-3" />
-                      {worldColor?.world_color}
-                    </Badge>
-                  </div>
-                </CardContent>
+                  </CardContent>
+                ) : (
+                  <CardContent className="pb-8">
+                    <div
+                      className="w-48 h-48 mx-auto rounded-full shadow-2xl transition-all duration-1000 ease-in-out flex items-center justify-center"
+                      style={{
+                        backgroundColor: worldColor?.world_color ?? "#FFFFFF",
+                      }}>
+                      <div className="text-white text-3xl font-bold drop-shadow-lg">
+                        {worldColor?.world_color}
+                      </div>
+                    </div>
+                    <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        <span className="text-sm">
+                          {worldColor?.colorsDescription.length}人が参加中
+                        </span>
+                      </div>
+                      <Badge variant="secondary" className="gap-1">
+                        <Heart className="h-3 w-3" />
+                        {worldColor?.world_color}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                )}
               </>
             ) : null}
           </Card>
