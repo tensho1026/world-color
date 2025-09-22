@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Mood;
 use App\Models\Vote;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 
 Log::info('api.php is loaded!');
@@ -92,38 +93,54 @@ Route::middleware('auth:sanctum')->post('/vote',function(Request $request) {
     return response()->json($vote);
 });
 
-Route::get('get-world-color',function() {
-$recentVotes = Vote::where('updated_at','>=',Carbon::now()->subHours())->get();
+Route::get('get-world-color', function () {
+    $recentVotes = Vote::where('updated_at', '>=', Carbon::now()->subHours())->get();
 
-if ($recentVotes->isEmpty()) {
-    return response()->json(['world_color' => '#FFFFFF']); 
-}
+    if ($recentVotes->isEmpty()) {
+        return response()->json([
+            'colorsDescription' => [],
+            'world_color' => '#FFFFFF',
+        ]);
+    }
 
-    $moodIds = $recentVotes->pluck('mood_id');
+    // 集計: mood_id ごとの投票数
+    $voteCounts = Vote::select('mood_id', DB::raw('count(*) as value'))
+        ->where('updated_at', '>=', Carbon::now()->subHours())
+        ->groupBy('mood_id')
+        ->pluck('value', 'mood_id');
 
-    $totalColors = Mood::whereIn('id', $moodIds)->get();
+    $moods = Mood::whereIn('id', $voteCounts->keys())->get();
 
+    // グラフ用: { id, name, color_code, value }
+    $colorsDescription = $moods->map(function ($mood) use ($voteCounts) {
+        return [
+            'id' => $mood->id,
+            'name' => $mood->name,
+            'color_code' => $mood->color_code,
+            'value' => (int) ($voteCounts[$mood->id] ?? 0),
+        ];
+    })->values();
 
-    $colors = $totalColors->map(function ($vote) {
-        $hex = ltrim($vote->color_code, '#');
+    // ワールドカラー算出
+    $colors = $moods->map(function ($mood) {
+        $hex = ltrim($mood->color_code, '#');
         return [
             'r' => hexdec(substr($hex, 0, 2)),
             'g' => hexdec(substr($hex, 2, 2)),
             'b' => hexdec(substr($hex, 4, 2)),
         ];
     });
+
     $avg = [
         'r' => intval($colors->avg('r')),
         'g' => intval($colors->avg('g')),
         'b' => intval($colors->avg('b')),
     ];
 
-    $worldColor = sprintf("#%02x%02x%02x", $avg['r'], $avg['g'], $avg['b']);
+    $worldColor = sprintf('#%02x%02x%02x', $avg['r'], $avg['g'], $avg['b']);
 
     return response()->json([
+        'colorsDescription' => $colorsDescription,
         'world_color' => $worldColor,
     ]);
-
-
-
 });

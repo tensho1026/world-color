@@ -22,14 +22,18 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Users, Palette, LogIn } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/Auth/Logout";
+import { useRouter } from "next/navigation";
+import Header from "@/components/home/Header";
+import Graqh from "@/components/home/Graqh";
 
-type Emotion = {
+export type Emotion = {
   id: string;
   name: string;
   color_code: string;
 };
 
 type WorldColor = {
+  colorsDescription: Emotion[];
   world_color: string;
 };
 
@@ -41,20 +45,27 @@ export default function EmotionColorApp() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [worldColor, setWorldColor] = useState<WorldColor | null>(null);
+  const [showGraph, setShowGraph] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchWorldColor = async () => {
       const res = await fetch("http://localhost:8000/api/get-world-color");
       if (res.ok) {
         const data = await res.json();
-        console.log(data, "worldcolor情報");
+        // console.log(data, "worldcolor情報");
         setWorldColor(data);
       }
     };
     fetchWorldColor();
   }, []);
   useEffect(() => {
-    console.log(worldColor, "worldColor情報");
+    console.log(user, "今現在のuser情報");
+  }, [user]);
+  useEffect(() => {
+    console.log(worldColor?.world_color, "今現在のworldColor情報");
+    console.log(worldColor?.colorsDescription, "グラフ表示用の内訳");
   }, [worldColor]);
 
   useEffect(() => {
@@ -67,7 +78,6 @@ export default function EmotionColorApp() {
     };
     fetchMoods();
   }, []);
-
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -117,27 +127,7 @@ export default function EmotionColorApp() {
   return (
     <div className="min-h-screen bg-background">
       {/* ヘッダー */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Palette className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold text-foreground">世界の感情色</h1>
-          </div>
-          {!user ? (
-            <Link href="/login">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 bg-transparent">
-                <LogIn className="h-4 w-4" />
-                ログイン
-              </Button>
-            </Link>
-          ) : (
-            <LogoutButton />
-          )}
-        </div>
-      </header>
+      <Header user={user} />
 
       {/* メインコンテンツ */}
       <main className="container mx-auto px-4 py-8">
@@ -151,30 +141,59 @@ export default function EmotionColorApp() {
               <CardDescription className="text-lg">
                 世界中の人々が感じている感情の色
               </CardDescription>
+              {/* 表示切り替え */}
+              <div className="mt-3 flex justify-center gap-2">
+                <Button
+                  size="sm"
+                  variant={showGraph ? "outline" : "default"}
+                  onClick={() => setShowGraph(false)}>
+                  色表示
+                </Button>
+                <Button
+                  size="sm"
+                  variant={showGraph ? "default" : "outline"}
+                  onClick={() => setShowGraph(true)}>
+                  色内訳
+                </Button>
+              </div>
             </CardHeader>
             {worldColor?.world_color ? (
               <>
-                <CardContent className="pb-8">
-                  <div
-                    className="w-48 h-48 mx-auto rounded-full shadow-2xl transition-all duration-1000 ease-in-out flex items-center justify-center"
-                    style={{
-                      backgroundColor: worldColor?.world_color ?? "#FFFFFF",
-                    }}>
-                    <div className="text-white text-3xl font-bold drop-shadow-lg">
-                      {worldColor?.world_color}
+                {showGraph ? (
+                  <CardContent className="pb-8">
+                    {/* グラフ未実装: プレースホルダー */}
+                    <div className="h-64 rounded-md border bg-muted/30 flex items-center justify-center text-muted-foreground">
+                      <Graqh datas={worldColor?.colorsDescription} />
                     </div>
-                  </div>
-                  <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      <span className="text-sm">12,847人が参加中</span>
+                    <div className="mt-4 text-sm text-muted-foreground">
+                      参加者: {worldColor?.colorsDescription.length ?? 0} 件
                     </div>
-                    <Badge variant="secondary" className="gap-1">
-                      <Heart className="h-3 w-3" />
-                      {worldColor?.world_color}
-                    </Badge>
-                  </div>
-                </CardContent>
+                  </CardContent>
+                ) : (
+                  <CardContent className="pb-8">
+                    <div
+                      className="w-48 h-48 mx-auto rounded-full shadow-2xl transition-all duration-1000 ease-in-out flex items-center justify-center"
+                      style={{
+                        backgroundColor: worldColor?.world_color ?? "#FFFFFF",
+                      }}>
+                      <div className="text-white text-3xl font-bold drop-shadow-lg">
+                        {worldColor?.world_color}
+                      </div>
+                    </div>
+                    <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        <span className="text-sm">
+                          {worldColor?.colorsDescription.length}人が参加中
+                        </span>
+                      </div>
+                      <Badge variant="secondary" className="gap-1">
+                        <Heart className="h-3 w-3" />
+                        {worldColor?.world_color}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                )}
               </>
             ) : null}
           </Card>
@@ -185,7 +204,8 @@ export default function EmotionColorApp() {
               <DialogTrigger asChild>
                 <Button
                   size="lg"
-                  className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                  className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                  onClick={() => !user && router.push("/login")}>
                   今の気分は？
                 </Button>
               </DialogTrigger>
