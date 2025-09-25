@@ -46,7 +46,7 @@ export default function EmotionColorApp() {
   const [showGraph, setShowGraph] = useState(false);
 
   const router = useRouter();
-
+  console.log(process.env.NEXT_PUBLIC_API_URL, "API_URL");
   useEffect(() => {
     const fetchWorldColor = async () => {
       const res = await fetch(
