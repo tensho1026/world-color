@@ -12,7 +12,7 @@ COPY . .
 
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
-# ✅ 修正ポイント：シェル形式 + $PORT
-CMD php artisan serve --host=0.0.0.0 --port=$PORT
+# ✅ 本番用：組み込みサーバーを public ディレクトリで起動
+CMD php -S 0.0.0.0:$PORT -t public
 
 EXPOSE 8080
