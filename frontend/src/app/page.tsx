@@ -79,7 +79,9 @@ export default function EmotionColorApp() {
     };
     fetchMoods();
   }, []);
-
+  useEffect(() => {
+    console.log(emotions, "emotions");
+  }, [emotions]);
   useEffect(() => {
     const fetchUser = async () => {
       const token = localStorage.getItem("token");
