@@ -19,9 +19,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Users, Palette, LogIn } from "lucide-react";
-import Link from "next/link";
-import { LogoutButton } from "@/components/Auth/Logout";
+import { Heart, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/home/Header";
 import Graqh from "@/components/home/Graqh";
@@ -51,10 +49,11 @@ export default function EmotionColorApp() {
 
   useEffect(() => {
     const fetchWorldColor = async () => {
-      const res = await fetch("http://localhost:8000/api/get-world-color");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/get-world-color`
+      );
       if (res.ok) {
         const data = await res.json();
-        // console.log(data, "worldcolor情報");
         setWorldColor(data);
       }
     };
@@ -70,7 +69,9 @@ export default function EmotionColorApp() {
 
   useEffect(() => {
     const fetchMoods = async () => {
-      const res = await fetch("http://localhost:8000/api/get-moods");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/get-moods`
+      );
       if (res.ok) {
         const data = await res.json();
         setEmotions(data);
@@ -86,7 +87,7 @@ export default function EmotionColorApp() {
         return;
       }
       if (token) {
-        const res = await fetch("http://localhost:8000/api/me", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -109,7 +110,7 @@ export default function EmotionColorApp() {
   const handleVote = async (emotion: Emotion) => {
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const res = await fetch("http://localhost:8000/api/vote", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/vote`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
